@@ -1,20 +1,17 @@
-import BottomPanel from '../BottomPanel';
-import CountriesLayer from '../CountriesLayer';
+
 import { ErrorAlert } from '../ErrorAlert';
 import { Identity } from '../Identity';
-import InfoModal from '../InfoModal';
 import Map from '../Map';
+import VideoModal from '../VideoModal';
 
 const App = () => {
   return (
     <>
       <Map>
-        <CountriesLayer></CountriesLayer>
       </Map>
-      <BottomPanel></BottomPanel>
       <ErrorAlert></ErrorAlert>
       <Identity></Identity>
-      <InfoModal></InfoModal>
+      <VideoModal></VideoModal>
     </>
   );
 };

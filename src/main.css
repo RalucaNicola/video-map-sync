@@ -9,7 +9,11 @@ body,
   width: 100%;
   font-family: var(--calcite-sans-family);
   color: var(--calcite-ui-text-1);
-  background: #a8a8a8;
+  background: #fff;
+}
+
+body {
+  padding: 20px;
 }
 
 .calcite-mode-dark,

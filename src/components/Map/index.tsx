@@ -1,24 +1,33 @@
 import * as styles from './Map.module.css';
 import { Children, FC, ReactElement, ReactNode, cloneElement, useEffect, useRef, useState } from 'react';
-import MapView from '@arcgis/core/views/MapView';
+import SceneView from '@arcgis/core/views/SceneView';
 import { mapConfig } from '../../config';
 import { setGlobalView } from '../../store/globals';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { setViewLoaded } from '../../store/services/app-loading/loadingSlice';
 import PortalItem from '@arcgis/core/portal/PortalItem';
-import WebMap from '@arcgis/core/WebMap';
+import WebScene from '@arcgis/core/WebScene';
 import { setError } from '../../store/services/error-messaging/errorSlice';
-import * as reactiveUtils from '@arcgis/core/core/reactiveUtils';
-import { getMapCenterFromHashParams, setMapCenterToHashParams } from '../../utils/URLHashParams';
+import { CalciteLabel } from '@esri/calcite-components-react';
+import '@esri/calcite-components/dist/components/calcite-action';
 
 interface MapProps {
   children?: ReactNode;
 }
 
 const Map: FC<MapProps> = ({ children }: MapProps) => {
-  const [view, setView] = useState<MapView | null>(null);
+  const [view, setView] = useState<SceneView | null>(null);
+  const [cameraFOV, setCameraFOV] = useState(85);
   const mapDivRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (view) {
+      const camera = view.camera.clone();
+      camera.fov = cameraFOV;
+      view.camera = camera;
+    }
+  }, [view, cameraFOV]);
 
   const initializeMapView = async () => {
     try {
@@ -27,11 +36,11 @@ const Map: FC<MapProps> = ({ children }: MapProps) => {
       });
 
       await portalItem.load();
-      const webmap = new WebMap({
+      const webmap = new WebScene({
         portalItem: portalItem
       });
       await webmap.load();
-      const mapView = new MapView({
+      const mapView = new SceneView({
         container: mapDivRef.current,
         map: webmap,
         padding: {
@@ -40,9 +49,6 @@ const Map: FC<MapProps> = ({ children }: MapProps) => {
         },
         ui: {
           components: []
-        },
-        constraints: {
-          minZoom: 1
         },
         popup: {
           dockEnabled: true,
@@ -60,35 +66,14 @@ const Map: FC<MapProps> = ({ children }: MapProps) => {
         setView(mapView);
         setGlobalView(mapView);
         dispatch(setViewLoaded(true));
-        const mapCenter = getMapCenterFromHashParams();
-        if (mapCenter) {
-          mapView.goTo({ zoom: mapCenter.zoom, center: [mapCenter.center.lon, mapCenter.center.lat] });
-        }
-        //window.view = mapView;
+        // @ts-ignore
+        window.view = mapView;
       });
     } catch (error) {
       const { message } = error;
       dispatch(setError({ name: 'Error on map', message: message }));
     }
   };
-
-  // add event listeners
-  useEffect(() => {
-    if (view) {
-      const listener = reactiveUtils.when(
-        () => view.stationary,
-        () => {
-          const lon = +view.center.longitude.toFixed(3);
-          const lat = +view.center.latitude.toFixed(3);
-          const zoom = view.zoom;
-          setMapCenterToHashParams({ lon, lat }, zoom);
-        }
-      );
-      return () => {
-        listener.remove();
-      };
-    }
-  }, [view]);
 
   // initialize view
   useEffect(() => {
@@ -97,12 +82,16 @@ const Map: FC<MapProps> = ({ children }: MapProps) => {
 
   return (
     <>
+      <CalciteLabel className={styles.fov}>Camera field of view: <input type='range' min={5} max={100} step={1} value={cameraFOV} onInput={(evt: React.ChangeEvent<HTMLInputElement>) => {
+        setCameraFOV(+evt.target.value);
+      }} /></CalciteLabel>
       <div className={styles.mapContainer} ref={mapDivRef}></div>
       {Children.map(children, (child: ReactNode) => {
         return cloneElement(child as ReactElement, {
           view
         });
       })}
+
     </>
   );
 };

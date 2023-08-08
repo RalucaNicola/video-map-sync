@@ -2,6 +2,14 @@
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0;
-  right: 0;
+  width: 1480px;
+  height: 920px;
+}
+
+.fov {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  pointer-events: all;
 }

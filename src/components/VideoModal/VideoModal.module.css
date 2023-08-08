@@ -1,0 +1,39 @@
+.show {
+  display: revert;
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  width: 1280px;
+  height: 720px;
+  pointer-events: none;
+}
+
+.hide {
+  display: none;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  pointer-events: all;
+}
+
+input {
+  pointer-events: all;
+}
+
+.video {
+  width: 100%;
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-timeline {
+  pointer-events: all;
+}
+@media (max-width: 700px) {
+  .modalContainer {
+    width: 100%;
+  }
+}

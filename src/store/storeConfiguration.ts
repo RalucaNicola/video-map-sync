@@ -1,16 +1,16 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import countryReducer from './services/country-selection/countrySelectionSlice';
 import loadingReducer from './services/app-loading/loadingSlice';
 import errorReducer from './services/error-messaging/errorSlice';
 import authenticationReducer from './services/authentication/authenticationSlice';
 import modalOptionsReducer from './services/modal-options/modalSlice';
+import videoModeReducer from './services/videoMode';
 
 const rootReducer = combineReducers({
   authentication: authenticationReducer,
   error: errorReducer,
   loading: loadingReducer,
-  country: countryReducer,
-  infoModal: modalOptionsReducer
+  infoModal: modalOptionsReducer,
+  videoMode: videoModeReducer
 });
 
 export const store = configureStore({
